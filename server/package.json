@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "start": "nodemon src/index.ts",
+    "start": "nodemon src/index.ts --files",
     "db:migrate": "knex migrate:latest",
     "db:seed": "knex seed:run",
     "setup": "yarn db:migrate && yarn db:seed",

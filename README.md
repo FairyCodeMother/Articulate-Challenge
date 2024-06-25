@@ -1,5 +1,8 @@
 # For Me # 
 ```
+docker-compose up
+docker-compose down
+docker-compose up --build
 docker ps // for the names
 
 // [Server container] Seed the DB
@@ -12,6 +15,7 @@ docker exec -it server-postgres-1 bash
 > psql -h localhost -p 5432 -U postgres
   > \dt
 
+curl --location 'http://localhost:5001/knowledge-check-blocks'
 ```
 ## Step 1: Project setup
 
@@ -58,23 +62,79 @@ Determine what the ask is and what work that entails. Extract for my notes:
 Create a local git repo:
 ```
 git init  // new local repo
+
+// update .gitignore as needed
+
 git add
 git commit -m "msg"
 ```
 
-Setup the client:
+**Client**
 ```
+# Setup
 cd client
 nvm install
 yarn install
+
+# Run
+yarn start
 ```
 
-Setup the server:
+**Server**
 ```
+# Make sure you're in the right dir!!
 cd server
+
+# Run server
+docker-compose up
+
+# Check db
+docker exec -it server-postgres-1 bash
+psql -h localhost -p 5432 -U postgres
+\dt
+
+SELECT * FROM information_schema.columns
+WHERE table_name = 'knowledgeCheckBlocks';
+
+/wq
+/q
 ```
+Docker installs and starts Yarn.
+
+Yarn runs the scripts in package.json:
+1. Spin up the Express server in `server/src/index.ts`
+   - Listen on port 5001
+   - Start in dev mode to get console logs
+   - Route endpoints to their handlers (`http://localhost:5001/endpoint`)
+     - GET `/knowledge-check-blocks` => `getKnowledgeCheckBlocks()`
+       - Retrieves "knowledgeCheckBlocks" table data and returns the contents as JSON
+2. Database (on port 5432)
+   - Use Knex to migrate the db
+   - Use Knex to seed the db
+   - Start postGres
+   - `yarn start`
 
  
+ 
+Check the response when I hit the provided endpoint:
+ ```
+ // curl --location 'http://localhost:5001/knowledge-check-blocks'
+ [
+    {
+        "id": "e50acfd3-a870-4cad-9ef2-a2ca30d24d81",
+        "questionId": "a8ebfafd-d81a-42ec-b54c-c14d007cd54e",
+        "feedback": "I just love cookies and a warm cup of coffee!"
+    }
+]
+```
+
+Add more fetchers: The server uses Knex to connect to, and seed, the database.
+Tables to fetch from:
+ - answers
+ - knowledgeCheckBlocks
+ - media
+ - questions
+
 
 <!-- 
 ## Part 1: The Coding Challenge

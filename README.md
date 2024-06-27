@@ -1,4 +1,5 @@
-# For Me # 
+# For Me
+
 ```
 docker-compose up
 docker-compose down
@@ -16,7 +17,12 @@ docker exec -it server-postgres-1 bash
   > \dt
 
 curl --location 'http://localhost:5001/knowledge-check-blocks'
+
+rm yarn.lock
+yarn install
+yarn add cors
 ```
+
 ## Step 1: Project setup
 
 ### Make a ticket/Identify the work
@@ -24,11 +30,12 @@ curl --location 'http://localhost:5001/knowledge-check-blocks'
 Determine what the ask is and what work that entails. Extract for my notes:
 
 **Blocks**- modular elements for responsive SPA (vertical-scrolling)
+
 - Simple: text and image layouts, videos, image galleries
 - Complex: interactive flash cards, tabbed modules and accordions
 
-
 **AC**
+
 - [ ] Decorate the knowledge block returned from `/server/src/index.ts:getKnowledgeCheckBlocks` with `questions`, `answers`, and `media` from DB
 - [ ] Block must be interactive
 - [ ] Populate block's configuration using provided REST API (`/server/src/`)
@@ -44,22 +51,26 @@ Determine what the ask is and what work that entails. Extract for my notes:
 - [ ] Include any additional setup steps (beyond the ones provided) that are required to run submission.
 
 **Implementation notes**
+
 - Only implement the box under the "Knowledge Check Block" heading
+
   - Use the image, choices, and feedback
   - Don't worry about implementing the sidebar or lesson header
 
 - Interactive block implementation should live `/client` directory
+
   - App skeleton is provided
 
 - REST API skeleton in `/server` and is reachable at http://localhost:5001
   - Currently only returns the parent `knowledgeCheckBlock`
     - No questions, answers, or media tied to it
 
-
 ## Step 2: Hook up the back
+
 > Do the provided setup steps and take a look at what's provided, including the database.
 
 Create a local git repo:
+
 ```
 git init  // new local repo
 
@@ -70,6 +81,7 @@ git commit -m "msg"
 ```
 
 **Client**
+
 ```
 # Setup
 cd client
@@ -81,6 +93,7 @@ yarn start
 ```
 
 **Server**
+
 ```
 # Make sure you're in the right dir!!
 cd server
@@ -93,15 +106,59 @@ docker exec -it server-postgres-1 bash
 psql -h localhost -p 5432 -U postgres
 \dt
 
-SELECT * FROM information_schema.columns
-WHERE table_name = 'knowledgeCheckBlocks';
+localhost:7482
+
+------------ HANDY QUERIES ------------
+<!-- Grab all relevant tables & their cols to check out their relationship possibilities: -->
+SELECT table_name, STRING_AGG(column_name, ', ') AS columns
+FROM information_schema.columns
+WHERE table_schema = 'public'
+-- WHERE table_name IN (
+--     SELECT tablename
+-- 	FROM pg_tables
+-- 	WHERE schemaname = 'public')
+AND table_name NOT LIKE '%knex%'
+GROUP BY table_name;
+
+
+
+SET search_path=public;
+
+SELECT
+	kcb."id" AS kcb_id,
+	a."id" AS a_id,
+	a."isCorrect" AS a_is_corr,
+	a."pos" AS a_pos,
+	q.id AS q_id,
+	m.id AS m_id,
+	m.type AS m_type,
+	m.url AS m_url,
+	kcb."feedback",
+	a."text" AS a_txt,
+	q.text AS q_txt
+	-- q."mediaId" AS q_mid,
+	-- kcb."questionId" AS kcb_qid,
+	-- a."knowledgeCheckBlockId" AS "a_kcb_id",
+FROM "knowledgeCheckBlocks" AS "kcb"
+	-- [knowledgeCheckBlocks] feedback, questionId, id
+FULL JOIN answers AS "a"
+	-- [answers] text, knowledgeCheckBlockId, isCorrect, pos, id
+	ON kcb.id = a.id
+FULL JOIN questions AS "q"
+	-- [questions] text, mediaId, id
+	ON kcb."questionId" = q.id
+FULL JOIN media AS "m"
+	-- [media] url, type, id
+	ON q."mediaId" = m.id
 
 /wq
 /q
 ```
+
 Docker installs and starts Yarn.
 
 Yarn runs the scripts in package.json:
+
 1. Spin up the Express server in `server/src/index.ts`
    - Listen on port 5001
    - Start in dev mode to get console logs
@@ -114,29 +171,47 @@ Yarn runs the scripts in package.json:
    - Start postGres
    - `yarn start`
 
- 
- 
 Check the response when I hit the provided endpoint:
- ```
- // curl --location 'http://localhost:5001/knowledge-check-blocks'
- [
-    {
-        "id": "e50acfd3-a870-4cad-9ef2-a2ca30d24d81",
-        "questionId": "a8ebfafd-d81a-42ec-b54c-c14d007cd54e",
-        "feedback": "I just love cookies and a warm cup of coffee!"
-    }
+
+```
+// curl --location 'http://localhost:5001/knowledge-check-blocks'
+[
+   {
+       "id": "e50acfd3-a870-4cad-9ef2-a2ca30d24d81",
+       "questionId": "a8ebfafd-d81a-42ec-b54c-c14d007cd54e",
+       "feedback": "I just love cookies and a warm cup of coffee!"
+   }
 ]
 ```
 
 Add more fetchers: The server uses Knex to connect to, and seed, the database.
 Tables to fetch from:
- - answers
- - knowledgeCheckBlocks
- - media
- - questions
 
+- answers
+- knowledgeCheckBlocks
+- media
+- questions
 
-<!-- 
+Start taking the responses apart and seeing how the tables relate to each other. I want to reduce how often I'll need to call. Grab everything in one go with Knex query.
+
+Break out a new `routes.ts` and a `middleware` directory. Setting up the backend as fully as possible to simplify implementing the frontend.
+
+Frontend:
+
+- Block- container
+  - Block- col
+    - Quiz- card
+      - Card- row
+      - Card- media
+        - Media zoom
+      - Card- horiz rule
+      - Card- interactive
+        - Answer- choices
+        - Answer- submit
+        - Answer- feedback
+        - Answer- retake
+
+<!--
 ## Part 1: The Coding Challenge
 
 Rise allows customers to create responsive single page, vertically scrolling lessons which include a variety of modular elements called Blocks. These Blocks can be as simple as text and image layouts, videos, image galleries, to more complex components like interactive flash cards, tabbed modules and accordions.
@@ -166,7 +241,7 @@ What you choose to implement from there is up to you. :)
 
 The challenge should take between 3 and 5 hours depending on experience level and we prefer you not devote more time than that. Instead, we ask that you either self-review your PR or share notes in the "Candidate Notes" section below about features or other details that were omitted due to time constraints. This will give our team the opportunity to see how you prioritize you work and should limit the time commitment required.
 
-Lastly, a "Feedback" pull request is automatically created by GitHub Classroom; please commit your work to the `master` branch and **do not merge** the pull request. When you are satisfied with your solution, share the link to the Feedback pull request with the recruiter. Reviewers will be able to review the diff in the pull request in GitHub. 
+Lastly, a "Feedback" pull request is automatically created by GitHub Classroom; please commit your work to the `master` branch and **do not merge** the pull request. When you are satisfied with your solution, share the link to the Feedback pull request with the recruiter. Reviewers will be able to review the diff in the pull request in GitHub.
 
 #### Install Docker
 

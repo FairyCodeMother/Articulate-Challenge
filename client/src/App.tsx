@@ -1,10 +1,10 @@
-// import React from "react";
+import React from "react";
 
-// import logoRise360 from "./logo-rise-360.svg";
-// import logoRiseCom from "./logo-rise-com.svg";
-// import "./App.css";
+import logoRise360 from "./logo-rise-360.svg";
+import logoRiseCom from "./logo-rise-com.svg";
+import "./App.css";
 
-// import QuizCard from "./components/QuizCard";
+import KnowledgeBlock from "./components/KnowledgeBlock";
 
 // function App() {
 //   return (
@@ -23,11 +23,23 @@
 //           Rise lesson
 //         </a>
 //         <p />
-//          <span className="App-code">{"/knowledge-check-blocks"}</span>
+//         <span className="App-code">{"/knowledge-check-blocks"}</span>
 
-//         <div>
-//           <QuizCard />
-//         </div>
+//         {/*
+//           - Block- container
+//             - Block- col
+//               - Quiz- card
+//                 - Card- row
+//                 - Card- media
+//                  - Media zoom
+//                 - Card- horiz rule
+//                 - Card- interactive
+//                   - Answer- choices
+//                   - Answer- submit
+//                   - Answer- feedback
+//                   - Answer- retake
+//         */}
+//         <div></div>
 //       </section>
 //     </div>
 //   );
@@ -35,12 +47,7 @@
 
 // export default App;
 
-import React from "react";
-import logoRise360 from "./logo-rise-360.svg";
-import logoRiseCom from "./logo-rise-com.svg";
-import "./App.css";
-
-function App() {
+const App: React.FC = () => {
   return (
     <div className="App">
       <header className="App-header">
@@ -59,24 +66,12 @@ function App() {
         <p />
         <span className="App-code">{"/knowledge-check-blocks"}</span>
 
-        {/*
-          - Block- container
-            - Block- col
-              - Quiz- card
-                - Card- row
-                - Card- media
-                 - Media zoom
-                - Card- horiz rule
-                - Card- interactive
-                  - Answer- choices
-                  - Answer- submit
-                  - Answer- feedback
-                  - Answer- retake
-        */}
-        <div></div>
+        <div>
+          <KnowledgeBlock />
+        </div>
       </section>
     </div>
   );
-}
+};
 
 export default App;

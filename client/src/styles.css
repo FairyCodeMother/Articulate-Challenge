@@ -1,0 +1,38 @@
+.App {
+  text-align: center;
+}
+
+.App-header {
+  background-color: #282c34;
+  padding: 20px;
+  color: white;
+}
+
+.block-knowledge__container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.knowledge-block {
+  border: 1px solid #ddd;
+  padding: 20px;
+  margin: 20px;
+  width: 300px;
+}
+
+.question {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.media img {
+  max-width: 100%;
+  margin-bottom: 10px;
+}
+
+.answers {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}

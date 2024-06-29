@@ -1,0 +1,74 @@
+/* client/src/components/KnowledgeBlock.css */
+
+body {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f8f9fa;
+  color: #333;
+}
+
+.block-knowledge__container {
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 20px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.knowledge-block {
+  margin-bottom: 20px;
+  padding: 20px;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.knowledge-block:last-child {
+  border-bottom: none;
+}
+
+.question {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: #222;
+}
+
+.media {
+  text-align: center;
+  margin: 20px 0;
+}
+
+.media img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.answers {
+  margin-bottom: 10px;
+}
+
+.interactive {
+  font-size: 16px;
+  margin: 5px 0;
+  padding: 10px;
+  background-color: #e9ecef;
+  border-radius: 4px;
+}
+
+.interactive.correct {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.interactive.incorrect {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.feedback {
+  font-style: italic;
+  color: #6c757d;
+}

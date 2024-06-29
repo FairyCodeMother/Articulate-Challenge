@@ -151,6 +151,46 @@ FULL JOIN media AS "m"
 	-- [media] url, type, id
 	ON q."mediaId" = m.id
 
+
+SELECT
+	q.id AS q_id, a."id" AS a_id, m.id AS m_id, kcb."id" AS kcb_id, a."isCorrect" AS a_is_corr, a."pos" AS a_pos, a."text" AS a_txt, q.text AS q_txt, m.url AS m_url, m.type AS m_type, kcb."feedback"
+FROM questions AS q
+FULL JOIN "knowledgeCheckBlocks" AS "kcb" ON "q".id = "kcb"."questionId"
+FULL JOIN answers AS "a" ON kcb.id = a."knowledgeCheckBlockId"
+FULL JOIN media AS "m" ON q."mediaId" = m.id
+
+SELECT
+  q.id AS "questionId"
+, q.text AS "questionText"
+, m.id AS "mediaId"
+, m.url AS "mediaUrl"
+, m.type AS "mediaType"
+, kcb.id AS "blockId"
+, kcb.feedback AS "feedback"
+, ARRAY_AGG(a.id) AS "answerIds"
+, ARRAY_AGG(a.text) AS "answerTexts"
+, ARRAY_AGG(a."isCorrect") AS "isCorrects"
+, ARRAY_AGG(a."pos") AS "POSs"
+FROM
+  questions AS q
+LEFT JOIN
+  "knowledgeCheckBlocks" AS kcb
+	ON q.id = kcb."questionId"
+LEFT JOIN
+  answers AS a
+	ON kcb.id = a."knowledgeCheckBlockId"
+LEFT JOIN
+  media AS m
+	ON q."mediaId" = m.id
+GROUP BY
+  q.id,
+  q.text,
+  m.id,
+  m.url,
+  m.type,
+  kcb.id,
+  kcb.feedback
+
 /wq
 /q
 ```

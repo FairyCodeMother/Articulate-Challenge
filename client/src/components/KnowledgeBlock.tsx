@@ -178,8 +178,8 @@ const KnowledgeBlock: React.FC = () => {
                         {submitted && (
                             <div className="feedback">
                                 {correctAnswers[block.question.questionId]
-                                    ? `CORRECT\n ${feedback}`
-                                    : `INCORRECT\n ${feedback}`}
+                                    ? `CORRECT:\n ${feedback}`
+                                    : `INCORRECT:\n ${feedback}`}
                             </div>
                         )}
                     </div>

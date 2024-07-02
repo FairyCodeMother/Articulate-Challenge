@@ -1,8 +1,8 @@
-import express, { Request, Response } from "express";
-import morgan from "morgan"; // HTTP request logging middleware
-import cors from "cors";
-import routes from "./routes";
-import { errorHandler } from "./middleware/errorHandler";
+import express, { Request, Response } from 'express';
+import morgan from 'morgan'; // HTTP request logging middleware
+import cors from 'cors';
+import routes from './routes';
+import { errorHandler } from './middleware/errorHandler';
 
 // import helmet from 'helmet/index.cjs';
 // import dotenv from '../node_modules/dotenv'
@@ -19,13 +19,13 @@ const port = process.env.PORT || 5001;
 app.use(cors());
 
 // Dev mode logs to console
-app.use(morgan("dev"));
+app.use(morgan('dev'));
 
 // JSON parsing
 app.use(express.json());
 
 // Routes
-app.use("/", routes);
+app.use('/', routes);
 
 // Error handling middleware
 app.use(errorHandler);

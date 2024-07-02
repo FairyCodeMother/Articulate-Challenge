@@ -1,13 +1,17 @@
 {
-  "compilerOptions": {
-    "esModuleInterop": true,
-    "rootDir": ".",
-    "skipLibCheck": true,
-    "strict": true,
-    "target": "es2022",
-    "typeRoots": ["./node_modules/@types", "./types"],
-    "baseUrl": "./",
-    "paths": { "*": ["node_modules/*"] }
-  },
-  "include": ["./**/*.ts"]
+    "compilerOptions": {
+        "esModuleInterop": true,
+        "rootDir": ".",
+        "moduleResolution": "node",
+        "skipLibCheck": true,
+        "strict": true,
+        "resolveJsonModule": true,
+        "outDir": "./dist",
+        "target": "es2022",
+        "typeRoots": ["./node_modules/@types", "./types"],
+        "baseUrl": "./",
+        "paths": { "*": ["node_modules/*"] }
+    },
+    "include": ["./**/*.ts"],
+    "exclude": ["node_modules"]
 }

@@ -121,7 +121,7 @@ Process & Steps:
     -   Add catches
     -   Have separate routes for queries and frontend
     -   Add controller and logger
--   ## Phase 3
+-   Phase 3
     -   Refine query
     -   Use the final route version
     -   Destructure components

@@ -1,90 +1,103 @@
-// server/src/controllers/knowledgeCheckBlockController.ts
+/**
+ * server/src/controllers/knowledgeCheckBlockController.ts
+ *
+ * Opportunities:
+ *  - Using hashing/memoization for faster lookups to handle larger datasets
+ *  - Error handling for missing/incomplete 'data'
+ *  - Refactor forEach loop (poss Array.reduce)
+ * Test cases:
+ *  - Behavior and edge cases of transformKnowledgeCheckBlocks
+ */
 import { Request, Response, NextFunction } from "express";
 
 // Normally would break these out
 interface Question {
-  questionId: string;
-  questionText: string;
+    questionId: string;
+    questionText: string;
 }
 
 interface Media {
-  mediaId: string;
-  mediaUrl: string;
-  mediaType: string;
+    mediaId: string;
+    mediaUrl: string;
+    mediaType: string;
 }
 
 interface Block {
-  blockId: string;
-  feedback: string;
+    blockId: string;
+    feedback: string;
 }
 
 interface Answer {
-  answerId: string;
-  answerText: string;
-  isCorrect: boolean;
+    answerId: string;
+    answerText: string;
+    isCorrect: boolean;
 }
 
 interface KnowledgeCheckBlock {
-  question: Question;
-  media: Media;
-  block: Block | null;
-  answers: Answer[]; // Grouped answers
+    question: Question;
+    media: Media;
+    block: Block | null;
+    answers: Answer[]; // Grouped answers
 }
 
 export const transformKnowledgeCheckBlocks = (
-  data: any[],
+    data: {
+        questionId: string;
+        questionText: string;
+        mediaId: string;
+        mediaUrl: string;
+        mediaType: string;
+        blockId: string | null;
+        feedback: string | null;
+        answerIds: string[];
+        answerTexts: string[];
+        isCorrects: boolean[];
+    }[]
 ): KnowledgeCheckBlock[] => {
-  const groupedBlocks: { [key: string]: KnowledgeCheckBlock } = {};
+    const groupedBlocks: { [key: string]: KnowledgeCheckBlock } = {};
 
-  data.forEach((item) => {
-    const blockId = item.blockId;
+    data.forEach((item) => {
+        const blockId = item.blockId || "";
 
-    // Check if the blockId exists and if it has multiple answerIds
-    if (
-      !groupedBlocks[blockId] &&
-      item.answerIds &&
-      item.answerIds.length > 1
-    ) {
-      groupedBlocks[blockId] = {
-        question: {
-          questionId: item.questionId,
-          questionText: item.questionText,
-        },
-        media: {
-          mediaId: item.mediaId,
-          mediaUrl: item.mediaUrl,
-          mediaType: item.mediaType,
-        },
-        block: item.blockId
-          ? {
-              blockId: item.blockId,
-              feedback: item.feedback,
-            }
-          : null,
-        answers: item.answerIds.map((answerId: string, index: number) => ({
-          // Explicitly typing answerId as string
-          answerId,
-          answerText: item.answerTexts[index],
-          isCorrect: item.isCorrects[index],
-        })),
-      };
-    } else if (groupedBlocks[blockId]) {
-      // If blockId already exists, add additional answers if they exist
-      item.answerIds.forEach((answerId: string, index: number) => {
-        // Explicitly typing answerId as string
-        if (
-          answerId &&
-          groupedBlocks[blockId].answers.length < item.answerIds.length
-        ) {
-          groupedBlocks[blockId].answers.push({
-            answerId,
-            answerText: item.answerTexts[index],
-            isCorrect: item.isCorrects[index],
-          });
+        if (!groupedBlocks[blockId]) {
+            groupedBlocks[blockId] = {
+                question: {
+                    questionId: item.questionId,
+                    questionText: item.questionText
+                },
+                media: {
+                    mediaId: item.mediaId,
+                    mediaUrl: item.mediaUrl,
+                    mediaType: item.mediaType
+                },
+                block: item.blockId
+                    ? {
+                          blockId: item.blockId,
+                          feedback: item.feedback || ""
+                      }
+                    : null,
+                answers: item.answerIds.map((answerId, index) => ({
+                    answerId,
+                    answerText: item.answerTexts[index],
+                    isCorrect: item.isCorrects[index]
+                }))
+            };
+        } else {
+            item.answerIds.forEach((answerId, index) => {
+                if (
+                    answerId &&
+                    groupedBlocks[blockId].answers.length <
+                        item.answerIds.length
+                ) {
+                    groupedBlocks[blockId].answers.push({
+                        answerId,
+                        answerText: item.answerTexts[index],
+                        isCorrect: item.isCorrects[index]
+                    });
+                }
+            });
         }
-      });
-    }
-  });
+    });
 
-  return Object.values(groupedBlocks);
+    return Object.values(groupedBlocks);
 };
